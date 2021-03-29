@@ -2,7 +2,7 @@ import socket
 
 #49152-6535 puertos disponibles
 host='localhost'
-port = 50002 #Puerto ocupado en TCP
+port = 50003 #Puerto ocupado en TCP
 BUFFER_SIZE = 2048
 
 def menu():
@@ -33,7 +33,7 @@ def jugar(TCP_SOCKET_CLIENTE):
 		print ("[°] Ingrese 3 para Jugar Tijera ")
 		print("____________________________________")
 		jugada=input(" Ingrese su Jugada: ")
-		jugada_bot=solicitar_jugada(TCP_SOCKET_CLIENTE)
+		jugada_bot=solicitar_jugada(TCP_SOCKET_CLIENTE,jugada)
 		ganador=ganador_ronda(int(jugada),int(jugada_bot))
 		if ganador==1:
 			jugador+=1
@@ -53,9 +53,9 @@ def jugar(TCP_SOCKET_CLIENTE):
 	return	
 
 
-def solicitar_jugada(TCP_SOCKET_CLIENTE):
+def solicitar_jugada(TCP_SOCKET_CLIENTE,jugada):
 	jugadas={"1":"Piedra","2":"Papel","3":"Tijera"}
-	mensaje = "JUGADA"            
+	mensaje = "JUGADA|"+str(jugada)            
 	TCP_SOCKET_CLIENTE.send(mensaje.encode())	
 	response = TCP_SOCKET_CLIENTE.recv(BUFFER_SIZE)#recibimos resultado	
 	jugada=response.decode()

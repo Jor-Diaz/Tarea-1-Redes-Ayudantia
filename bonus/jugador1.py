@@ -33,7 +33,7 @@ def jugar(TCP_SOCKET_CLIENTE):
 		print ("[°] Ingrese 3 para Jugar Tijera ")
 		print("____________________________________")
 		jugada=input(" Ingrese su Jugada: ")
-		jugada_bot=solicitar_jugada(TCP_SOCKET_CLIENTE)
+		jugada_bot=solicitar_jugada(TCP_SOCKET_CLIENTE,jugada)
 		ganador=ganador_ronda(int(jugada),int(jugada_bot))
 		if ganador==1:
 			jugador+=1

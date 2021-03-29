@@ -1,7 +1,7 @@
 import socket
 
 #49152-6535 puertos disponibles
-port = 50002 #Puerto ocupado en TCP
+port = 50003 #Puerto ocupado en TCP
 BUFFER_SIZE = 2048 
 MAQUINA="localhost"
 PUERTO_MAQUINA=50001
@@ -16,10 +16,11 @@ def PedirPartida(IP, PUERTO):#Funcion para conexion UDP
     print("[°] El servidor de Cachipun respondio ", respuesta)
     return respuesta
 
-def solicitar_jugada(IP, PUERTO):
+def solicitar_jugada(IP, PUERTO,jugada):
+    jugada=jugada.split("|")
     jugadas={"1":"Piedra","2":"Papel","3":"Tijera"}
     UDP_SOCKET_CLIENTE=socket.socket(socket.AF_INET,socket.SOCK_DGRAM) #Creamos el socket UDP       
-    mensaje = "JUGADA"                       
+    mensaje = "2|"+str(jugada[1])               
     UDP_SOCKET_CLIENTE.sendto(mensaje.encode(),(IP,PUERTO)) #Enviamos el mensaje OK     
     response, _ = UDP_SOCKET_CLIENTE.recvfrom(BUFFER_SIZE) #Obtenemos la respuesta del servidor 
     UDP_SOCKET_CLIENTE.close()#Cerramos conexion UDP
@@ -39,7 +40,7 @@ def intermediario_partida(TCP_SOCKET_CLIENTE,IP,PUERTO):
     while True:   
         data = TCP_SOCKET_CLIENTE.recv(BUFFER_SIZE) 
         if data.decode() =="JUGADA":
-            jugada=solicitar_jugada(IP, PUERTO)
+            jugada=solicitar_jugada(IP, PUERTO,data.decode())
             TCP_SOCKET_CLIENTE.send(jugada.encode()) 
         if data.decode()=="TERMINAR":
             TCP_SOCKET_CLIENTE.send("OK".encode()) 
