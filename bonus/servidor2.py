@@ -20,31 +20,24 @@ def solicitar_jugada(IP, PUERTO,jugada):
     jugada=jugada.split("|")
     jugadas={"1":"Piedra","2":"Papel","3":"Tijera"}
     UDP_SOCKET_CLIENTE=socket.socket(socket.AF_INET,socket.SOCK_DGRAM) #Creamos el socket UDP       
-    mensaje = "2|"+str(jugada[1])               
+    mensaje = "2|"+str(jugada[1])                       
     UDP_SOCKET_CLIENTE.sendto(mensaje.encode(),(IP,PUERTO)) #Enviamos el mensaje OK     
     response, _ = UDP_SOCKET_CLIENTE.recvfrom(BUFFER_SIZE) #Obtenemos la respuesta del servidor 
     UDP_SOCKET_CLIENTE.close()#Cerramos conexion UDP
     jugada=response.decode()
-    print("[°] El bot jugo ", jugadas[jugada])
+    print("[°] El Rival jugo ", jugadas[jugada])
     return jugada
-
-def terminar_udp(IP, PUERTO):
-    UDP_SOCKET_CLIENTE=socket.socket(socket.AF_INET,socket.SOCK_DGRAM) #Creamos el socket UDP       
-    mensaje = "STOP"                       
-    UDP_SOCKET_CLIENTE.sendto(mensaje.encode(),(IP,PUERTO)) #Enviamos el mensaje OK     
-    response, _ = UDP_SOCKET_CLIENTE.recvfrom(BUFFER_SIZE) #Obtenemos la respuesta del servidor 
-    UDP_SOCKET_CLIENTE.close()#Cerramos conexion UDP
-    return
 
 def intermediario_partida(TCP_SOCKET_CLIENTE,IP,PUERTO):
     while True:   
         data = TCP_SOCKET_CLIENTE.recv(BUFFER_SIZE) 
-        if data.decode() =="JUGADA":
+        mensaje=data.decode().split("|")
+        print(mensaje)
+        if mensaje[0] =="JUGADA":
             jugada=solicitar_jugada(IP, PUERTO,data.decode())
             TCP_SOCKET_CLIENTE.send(jugada.encode()) 
         if data.decode()=="TERMINAR":
-            TCP_SOCKET_CLIENTE.send("OK".encode()) 
-            terminar_udp(IP, PUERTO)
+            TCP_SOCKET_CLIENTE.send("OK".encode())            
             print("[°] Partida terminada\n")   
             break
     return
@@ -62,8 +55,7 @@ while True:
     mensaje = data.decode()                
     print("\n")
     print('# Mensaje recibido de cliente: {}'.format(data.decode('utf-8')))         
-    if mensaje == "2":                
-        terminar_udp(MAQUINA, PUERTO_MAQUINA)    
+    if mensaje == "2":                        
         print("[°] Conexión terminada")                    
         break                             
     else:            

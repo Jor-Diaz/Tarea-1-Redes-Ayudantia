@@ -30,9 +30,10 @@ def jugar(TCP_SOCKET_CLIENTE):
 	while bot<3 and jugador<3:
 		print ("[°] Ingrese 1 para Jugar Piedra ")
 		print ("[°] Ingrese 2 para Jugar Papel ")
-		print ("[°] Ingrese 3 para Jugar Tijera ")
+		print ("[°] Ingrese 3 para Jugar Tijera ")		
 		print("____________________________________")
 		jugada=input(" Ingrese su Jugada: ")
+		print ("[°] Esperando Jugada del rival ")
 		jugada_bot=solicitar_jugada(TCP_SOCKET_CLIENTE,jugada)
 		ganador=ganador_ronda(int(jugada),int(jugada_bot))
 		if ganador==1:
@@ -40,13 +41,13 @@ def jugar(TCP_SOCKET_CLIENTE):
 			print("[°] Usted gano esta ronda :)")
 		elif ganador==2:
 			bot+=1
-			print("[°] El Bot gano esta ronda :C")
+			print("[°] El Rival gano esta ronda :C")
 		else:
 			print("[°] Esta ronda fue un empate :S")
 		print("\n")
-		print("[°] El marcador actual es jugador ", jugador, " , Bot ", bot)
+		print("[°] El marcador actual es jugador ", jugador, " , Rival ", bot)
 	if bot > jugador:
-			print("[°] El ganador de la partida fue el Bot :( , más suerte para la proxima!")
+			print("[°] El ganador de la partida fue el Rival :( , más suerte para la proxima!")
 	else:
 		print("[°] El ganador de la partida fue el Usted :D ,Felicitaciones!")
 	terminar_partida(TCP_SOCKET_CLIENTE)
@@ -59,7 +60,8 @@ def solicitar_jugada(TCP_SOCKET_CLIENTE,jugada):
 	TCP_SOCKET_CLIENTE.send(mensaje.encode())	
 	response = TCP_SOCKET_CLIENTE.recv(BUFFER_SIZE)#recibimos resultado	
 	jugada=response.decode()
-	print("[°] El bot jugo ", jugadas[jugada])
+	print(jugada)
+	print("[°] El Rival jugo ", jugadas[jugada])
 	return jugada
 
 def terminar_partida(TCP_SOCKET_CLIENTE):
@@ -77,15 +79,17 @@ print("    Bienvenido al juego Super-Cachipun 2021 ")
 print("##################################################################################")
 while opcion!="2": 
 	menu()
-	opcion=str(input())
+	opcion=str(input("Ingrese su opcion: "))
 	TCP_SOCKET_CLIENTE.send(opcion.encode())		
 	if opcion=="1":					
+		print("[°] Servidores Operativos ")	
+		print("[°] Conectando con Super-Cachipun 2021 ")	
+		print("[°] Buscando un rival... ")
 		data = TCP_SOCKET_CLIENTE.recv(BUFFER_SIZE)#recibimos resultado
 		status=data.decode()								
-		if status=="OK":#si existe la pagina			
-			print("[°] Servidores Operativos ")	
-			print("[°] Conectando con Super-Cachipun 2021 ")	
+		if status=="OK":#si existe la pagina					
 			print("\n")		
+			print("[°] Rival encontrado, emparejando partida ")
 			print("[°] Comienza el Juego ")
 			jugar(TCP_SOCKET_CLIENTE)			
 			print("[°] Partida Terminada ")
