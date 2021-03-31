@@ -56,38 +56,38 @@ def jugar(TCP_SOCKET_CLIENTE):
 def solicitar_jugada(TCP_SOCKET_CLIENTE):
 	jugadas={"1":"Piedra","2":"Papel","3":"Tijera"}
 	mensaje = "JUGADA"            
-	TCP_SOCKET_CLIENTE.send(mensaje.encode())	
-	response = TCP_SOCKET_CLIENTE.recv(BUFFER_SIZE)#recibimos resultado	
+	TCP_SOCKET_CLIENTE.send(mensaje.encode()) #solicitar jugada a servidor intermedio	
+	response = TCP_SOCKET_CLIENTE.recv(BUFFER_SIZE) #recibimos jugada
 	jugada=response.decode()
 	print("[°] El bot jugo ", jugadas[jugada])
 	return jugada
 
 def terminar_partida(TCP_SOCKET_CLIENTE):
     TCP_SOCKET_CLIENTE.send("TERMINAR".encode())	
-    response = TCP_SOCKET_CLIENTE.recv(BUFFER_SIZE)#recibimos resultado		
+    response = TCP_SOCKET_CLIENTE.recv(BUFFER_SIZE) #recibimos resultado (devolver ACK)		
     return
 
 TCP_SOCKET_CLIENTE=socket.socket(socket.AF_INET, socket.SOCK_STREAM) #Creamos Conexion TCP
-TCP_SOCKET_CLIENTE.connect((host, port)) #Nos conectamos
+TCP_SOCKET_CLIENTE.connect((host, port)) #Nos conectamos al server
 opcion=""
 print("[°]Conexión establecida con el servidor en el puerto "+str(port))
 print("\n")
 print("##################################################################################")
 print("    Bienvenido al juego Super-Cachipun 2021 ")
 print("##################################################################################")
-while opcion!="2": 
+while opcion!="2": #mientras el jugador quiera jugar
 	menu()
 	opcion=str(input())
-	TCP_SOCKET_CLIENTE.send(opcion.encode())		
-	if opcion=="1":					
-		data = TCP_SOCKET_CLIENTE.recv(BUFFER_SIZE)#recibimos resultado
+	TCP_SOCKET_CLIENTE.send(opcion.encode()) #Enviamos opción al servidor intermediario
+	if opcion=="1":	#queremos jugar				
+		data = TCP_SOCKET_CLIENTE.recv(BUFFER_SIZE) #recibimos disponibilidad del servidor intermedio (que por UDP recibio de cachipún)
 		status=data.decode()								
-		if status=="OK":#si existe la pagina			
+		if status=="OK": #El server esta disponible para jugar			
 			print("[°] Servidores Operativos ")	
 			print("[°] Conectando con Super-Cachipun 2021 ")	
 			print("\n")		
 			print("[°] Comienza el Juego ")
-			jugar(TCP_SOCKET_CLIENTE)			
+			jugar(TCP_SOCKET_CLIENTE) # Que comience el Juego	
 			print("[°] Partida Terminada ")
 		else:#si es que no esta disponible
 			print("[°] El servidor no esta disponible, lamentamos la situación")		

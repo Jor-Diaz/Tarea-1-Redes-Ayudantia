@@ -57,7 +57,7 @@ func main() {
         IP:="localhost"      
         fmt.Println("[°] Bienvenidos al servidor de Super-Cachipun 2021")        
         fmt.Println("[°] El servicio para pedir partidas se ejecutara en el puerto ", PUERTO_SERVICIO)                
-        s, err := net.ResolveUDPAddr("udp4", PUERTO_SERVICIO)
+        s, err := net.ResolveUDPAddr("udp4", PUERTO_SERVICIO) //dirección
         if err != nil {
                 fmt.Println(err)
                 return
@@ -73,18 +73,18 @@ func main() {
         for {
                 n, addr, err := connection.ReadFromUDP(buffer)
                 fmt.Print("# El cliente envio -> ", string(buffer[0:n]),"\n")                                
-                if strings.TrimSpace(string(buffer[0:n])) == "PARTIDA" {
+                if strings.TrimSpace(string(buffer[0:n])) == "PARTIDA" { //si el servidor intermedio esta solicitando estado
                         partida:=random(1, 11)                        
-                        if partida > 1 {       
+                        if partida > 1 { // DISPONIBLE      
                                 PUERTO_PARTIDAS:=random(50010, 50021)                                     
-                                mensaje:= "OK|"+IP+"|"+strconv.Itoa(PUERTO_PARTIDAS)
+                                mensaje:= "OK|"+IP+"|"+strconv.Itoa(PUERTO_PARTIDAS) //OK|"ip"|puerto random 
                                 _, err = connection.WriteToUDP([]byte(mensaje), addr)
                                 if err != nil {
                                         fmt.Println(err)
                                         return
                                 }                                
                                 ejecucion_partidas(strconv.Itoa(PUERTO_PARTIDAS))
-                        }else{
+                        }else{ //NO DISPONIBLE
                                 mensaje:=[]byte("FAIL|X|X")
                                 _, err = connection.WriteToUDP(mensaje, addr)
                                 if err != nil {

@@ -8,7 +8,7 @@ PUERTO_MAQUINA=50001
 
 def PedirPartida(IP, PUERTO):#Funcion para conexion UDP            
     UDP_SOCKET_CLIENTE=socket.socket(socket.AF_INET,socket.SOCK_DGRAM) #Creamos el socket UDP       
-    mensaje = "PARTIDA"                       
+    mensaje = "PARTIDA"  #Solicitar partida al servidor cachipun                 
     UDP_SOCKET_CLIENTE.sendto(mensaje.encode(),(IP,PUERTO))   
     response, _ = UDP_SOCKET_CLIENTE.recvfrom(BUFFER_SIZE) 
     UDP_SOCKET_CLIENTE.close()#Cerramos conexion UDP
@@ -37,13 +37,13 @@ def terminar_udp(IP, PUERTO):
 
 def intermediario_partida(TCP_SOCKET_CLIENTE,IP,PUERTO):
     while True:   
-        data = TCP_SOCKET_CLIENTE.recv(BUFFER_SIZE) 
-        if data.decode() =="JUGADA":
-            jugada=solicitar_jugada(IP, PUERTO)
-            TCP_SOCKET_CLIENTE.send(jugada.encode()) 
-        if data.decode()=="TERMINAR":
-            TCP_SOCKET_CLIENTE.send("OK".encode()) 
-            terminar_udp(IP, PUERTO)
+        data = TCP_SOCKET_CLIENTE.recv(BUFFER_SIZE) #estamos recibiendo lo que dice el cliente
+        if data.decode() =="JUGADA": #quiere jugar
+            jugada=solicitar_jugada(IP, PUERTO) # le pedimos al bot
+            TCP_SOCKET_CLIENTE.send(jugada.encode())  #le pasamos la jugada al cliente
+        if data.decode()=="TERMINAR": #no quiere jugar
+            TCP_SOCKET_CLIENTE.send("OK".encode())
+            terminar_udp(IP, PUERTO) #terminar conexión con cachipun
             print("[°] Partida terminada\n")   
             break
     return
@@ -69,11 +69,11 @@ while True:
         print("[°] Consultando estado servidores de Cachipun")           
         respuesta=PedirPartida(MAQUINA, PUERTO_MAQUINA)
         ESTADO,IP,PUERTO=respuesta.split("|")        
-        if ESTADO== "FAIL" : # si el url no se encuentra en la web ni en la LRU                        
-            TCP_SOCKET_CLIENTE.send("FAIL".encode()) # Hacemos echo convirtiendo de nuevo a bytes       
+        if ESTADO== "FAIL" : # Si el servidor no esta disponible                     
+            TCP_SOCKET_CLIENTE.send("FAIL".encode()) # Avisamos al cliente que no se puede jugar       
             print("[°] Los servidores de juego no estan disponibles")                                                             
         else:                         
-            TCP_SOCKET_CLIENTE.send("OK".encode()) # Enviamos el ok al cliente para la conexion UDP
+            TCP_SOCKET_CLIENTE.send("OK".encode()) # Le avisamos al cliente que si esta disponible
             print("[°] Los servidores de juego operativos")         
             intermediario_partida(TCP_SOCKET_CLIENTE,IP,int(PUERTO))                                                                                                                                        
     print("-------------------------------------------")                                                             
